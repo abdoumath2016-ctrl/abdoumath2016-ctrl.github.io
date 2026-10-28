@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.abdoumath2016_ctrl.twa",
+    "sha256_cert_fingerprints": ["85:A9:2F:A2:FC:26:EB:F5:BD:B9:A0:E3:CB:90:64:91:95:22:03:7C:95:A7:10:93:C5:63:7F:85:CC:DC:EA:33"]
+  }
+}]
