@@ -318,6 +318,15 @@ h1 em{font-style:normal;color:var(--gold)}
 .sheet.bahr-mode .bh-c.on{background:#1B2A4A;border-color:#1B2A4A;color:#F3EAD3}
 .sheet.bahr-mode .bh-nav button{border-color:#d9c89c;color:#1B2A4A}
 .sheet.bahr-mode .rq-b:focus-visible,.sheet.bahr-mode .bh-c:focus-visible,.sheet.bahr-mode .bh-nav button:focus-visible,.raq .rq-b:focus-visible{outline-color:#1B2A4A}
+.mh-top{display:flex;justify-content:space-between;align-items:center}
+.mh-fav{border:0;background:transparent;color:var(--gold);font-size:1.3rem;cursor:pointer;line-height:1;padding:2px 6px}
+.mh-deed{margin:0;font-weight:700}
+.mh-tip{margin:4px 0 0;font-size:.88rem;color:var(--muted)}
+.mh-list{margin:0;padding-inline-start:22px;line-height:1.9}
+.mh-warn{border-color:var(--must)}
+.mh-warn .bh-l{color:var(--must)}
+.tools{flex-wrap:wrap}
+.mh-fav:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tired-note{background:var(--gold-soft);border-radius:16px;padding:10px 14px;font-size:.9rem}
 .sheet{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .shead{position:sticky;top:0;background:var(--bg);display:flex;justify-content:space-between;align-items:center;padding-block:14px;max-width:560px;margin:0 auto;z-index:1}
@@ -405,7 +414,7 @@ h1 em{font-style:normal;color:var(--gold)}
     <label for="nShukr">نعمة شكرتُ الله عليها اليوم<textarea id="nShukr" rows="1"></textarea></label>
     <div class="nstat" id="nstat"></div>
   </div>
-  <div class="tools"><button type="button" id="bDuas">أدعيتي</button><button type="button" id="bReview">مراجعة الأسبوع</button><button type="button" id="bCustom">تخصيص القائمة</button></div>
+  <div class="tools"><button type="button" id="bDuas">أدعيتي</button><button type="button" id="bMahab">محابّ الله</button><button type="button" id="bReview">مراجعة الأسبوع</button><button type="button" id="bCustom">تخصيص القائمة</button></div>
   <section>
     <h2 class="whd">إنجازاتي</h2>
     <div class="badges" id="badges"></div>
@@ -468,6 +477,7 @@ const GROUPS=[
   I("ahldua","الدعاء للأهل والأولاد","في سجودك وأوقات الإجابة",{x:1})]},
  {id:"birr",h:"البرّ والإحسان",items:[
   I("khabia","الخبيئة","عمل صالح في السر لا يعلمه أحد"),
+  I("mahab","عمل من محابّ الله","",{panel:"mahab"}),
   I("sadaqa","صدقة ولو قليلة"),
   I("ihsan","الإحسان إلى الناس","",{subs:[["salam","إفشاء السلام والكلمة الطيبة"],["ghaib","الدعاء لأخ بظهر الغيب"],["adha","إماطة الأذى عن الطريق"],["hajah","قضاء حاجة أو مساعدة محتاج"]]}),
   I("silah","الصلة والتواصل","",{x:1,subs:[["rahim","صلة رحم"],["marid","زيارة مريض أو السؤال عنه"]]})]},
@@ -588,6 +598,7 @@ function renderSheet(){
   if(sheetMode==="welcome"){renderWelcome(body,title);return}
   if(sheetMode==="backup"){renderBackup(body,title);return}
   if(sheetMode==="mutlaq"){renderMutlaq(body,title,k);return}
+  if(sheetMode==="mahab"){renderMahab(body,title,k);return}
   if(sheetMode==="bahr"){renderBahr(body,title,k);return}
   if(sheetMode==="hadith"){renderHadith(body,title,k);return}
   if(sheetMode==="wird"){
@@ -946,6 +957,83 @@ function renderBahr(body,title,k){
   body.appendChild(nav);
   const note=document.createElement("p");note.className="sub-t";note.textContent="الأدلة هنا آيات وأحاديث صحيحة أو حسنة مع مخرّجها. عند القراءة من الكتاب انظر الحاشية، فما ضُعّف هناك فلا تعتمده. أرقام الصفحات من طبعة الدار السلفية، ط١ ١٤٢٨هـ.";body.appendChild(note);
 }
+const MAHAB=[
+{id:"q1",t:"quran",deed:"الإحسان",text:"﴿وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ﴾",src:"سورة البقرة: ١٩٥",tip:"أتقن عملك اليوم كأن الله يراك، وأحسن إلى من أساء إليك."},
+{id:"q2",t:"quran",deed:"التوبة والطهارة",text:"﴿إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ وَيُحِبُّ الْمُتَطَهِّرِينَ﴾",src:"سورة البقرة: ٢٢٢",tip:"جدِّد التوبة والاستغفار، وحافظ على الوضوء."},
+{id:"q3",t:"quran",deed:"الوفاء بالعهد والتقوى",text:"﴿بَلَىٰ مَنْ أَوْفَىٰ بِعَهْدِهِ وَاتَّقَىٰ فَإِنَّ اللَّهَ يُحِبُّ الْمُتَّقِينَ﴾",src:"سورة آل عمران: ٧٦",tip:"أوفِ بوعد وعدته لأحد، ولو كان صغيرًا."},
+{id:"q4",t:"quran",deed:"الإنفاق وكظم الغيظ والعفو",text:"﴿الَّذِينَ يُنفِقُونَ فِي السَّرَّاءِ وَالضَّرَّاءِ وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ ۗ وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ﴾",src:"سورة آل عمران: ١٣٤",tip:"إذا غضبت فأمسك لسانك، واعفُ عن أحد أخطأ في حقك."},
+{id:"q5",t:"quran",deed:"الصبر",text:"﴿وَاللَّهُ يُحِبُّ الصَّابِرِينَ﴾",src:"سورة آل عمران: ١٤٦",tip:"اصبر على طاعة، وعن معصية، وعلى ما يصيبك."},
+{id:"q6",t:"quran",deed:"التوكل على الله",text:"﴿فَإِذَا عَزَمْتَ فَتَوَكَّلْ عَلَى اللَّهِ ۚ إِنَّ اللَّهَ يُحِبُّ الْمُتَوَكِّلِينَ﴾",src:"سورة آل عمران: ١٥٩",tip:"خذ بالأسباب، ثم فوِّض أمرك إلى الله بقلبك."},
+{id:"q7",t:"quran",deed:"اتباع النبي ﷺ",text:"﴿قُلْ إِن كُنتُمْ تُحِبُّونَ اللَّهَ فَاتَّبِعُونِي يُحْبِبْكُمُ اللَّهُ وَيَغْفِرْ لَكُمْ ذُنُوبَكُمْ ۗ وَاللَّهُ غَفُورٌ رَّحِيمٌ﴾",src:"سورة آل عمران: ٣١",tip:"أحيِ سنة من سنن النبي ﷺ اليوم."},
+{id:"q8",t:"quran",deed:"العدل",text:"﴿وَأَقْسِطُوا ۖ إِنَّ اللَّهَ يُحِبُّ الْمُقْسِطِينَ﴾",src:"سورة الحجرات: ٩",tip:"اعدل بين أولادك وطلابك ومن تحت يدك."},
+{id:"q9",t:"quran",deed:"التطهر",text:"﴿فِيهِ رِجَالٌ يُحِبُّونَ أَن يَتَطَهَّرُوا ۚ وَاللَّهُ يُحِبُّ الْمُطَّهِّرِينَ﴾",src:"سورة التوبة: ١٠٨",tip:"اعتنِ بطهارة البدن والثوب والمكان."},
+{id:"q10",t:"quran",deed:"التواضع للمؤمنين",text:"﴿فَسَوْفَ يَأْتِي اللَّهُ بِقَوْمٍ يُحِبُّهُمْ وَيُحِبُّونَهُ أَذِلَّةٍ عَلَى الْمُؤْمِنِينَ أَعِزَّةٍ عَلَى الْكَافِرِينَ﴾",src:"سورة المائدة: ٥٤",tip:"تواضع لإخوانك ولِن لهم في الكلام."},
+{id:"q11",t:"quran",deed:"الاجتماع والتراص في سبيل الله",text:"﴿إِنَّ اللَّهَ يُحِبُّ الَّذِينَ يُقَاتِلُونَ فِي سَبِيلِهِ صَفًّا كَأَنَّهُم بُنْيَانٌ مَّرْصُوصٌ﴾",src:"سورة الصف: ٤",tip:"كن عونًا لإخوانك، وابتعد عن أسباب الفرقة."},
+
+{id:"s1",t:"sunnah",deed:"المداومة على العمل ولو قليلًا",text:"«… وأنَّ أحبَّ الأعمالِ إلى اللهِ أدْوَمُها وإنْ قَلَّ»",src:"متفق عليه: البخاري (٦٤٦٤)، ومسلم (٧٨٣)",grade:"صحيح",tip:"اختر عملًا يسيرًا تستطيع المداومة عليه كل يوم."},
+{id:"s2",t:"sunnah",deed:"الصلاة على وقتها، ثم بر الوالدين",text:"سألتُ النبيَّ ﷺ: أيُّ العملِ أحبُّ إلى الله؟ قال: «الصلاةُ على وقتِها». قلتُ: ثم أيّ؟ قال: «ثم برُّ الوالدَين». قلتُ: ثم أيّ؟ قال: «الجهادُ في سبيلِ الله»",src:"عن ابن مسعود رضي الله عنه. متفق عليه: البخاري (٥٢٧)، ومسلم (٨٥)",grade:"صحيح",tip:"صلِّ الفريضة في أول وقتها، واتصل بوالديك أو ادعُ لهما."},
+{id:"s3",t:"sunnah",deed:"الباقيات الصالحات",text:"«أحبُّ الكلامِ إلى اللهِ أربعٌ: سبحانَ اللهِ، والحمدُ للهِ، ولا إلهَ إلا اللهُ، واللهُ أكبرُ، لا يضرُّك بأيِّهنَّ بدأتَ»",src:"رواه مسلم (٢١٣٧)",grade:"صحيح",tip:"ردِّدها في طريقك وأثناء الانتظار."},
+{id:"s4",t:"sunnah",deed:"سبحان الله وبحمده، سبحان الله العظيم",text:"«كلمتانِ خفيفتانِ على اللسانِ، ثقيلتانِ في الميزانِ، حبيبتانِ إلى الرحمنِ: سبحانَ اللهِ وبحمدِه، سبحانَ اللهِ العظيمِ»",src:"متفق عليه: البخاري (٦٤٠٦)، ومسلم (٢٦٩٤)",grade:"صحيح",tip:"اجعلها وردًا ثابتًا بعد كل صلاة."},
+{id:"s5",t:"sunnah",deed:"أحب الكلام: سبحان الله وبحمده",text:"«إنَّ أحبَّ الكلامِ إلى اللهِ: سبحانَ اللهِ وبحمدِه»",src:"رواه مسلم (٢٧٣١)",grade:"صحيح",tip:"قلها مئة مرة في يومك."},
+{id:"s6",t:"sunnah",deed:"الفرائض ثم النوافل",text:"«… وما تقرَّبَ إليَّ عبدي بشيءٍ أحبَّ إليَّ مما افترضتُ عليه، وما يزالُ عبدي يتقرَّبُ إليَّ بالنوافلِ حتى أُحبَّه …»",src:"حديث قدسي، رواه البخاري (٦٥٠٢)",grade:"صحيح",tip:"أتقن الفرائض أولًا، ثم أضف سنة راتبة أو ركعتي ضحى."},
+{id:"s7",t:"sunnah",deed:"الرفق",text:"«إنَّ اللهَ رفيقٌ يحبُّ الرفقَ في الأمرِ كلِّه»",src:"متفق عليه: البخاري (٦٩٢٧)، ومسلم (٢١٦٥)",grade:"صحيح",tip:"ارفق بأهلك وطلابك في الكلام والتعامل."},
+{id:"s8",t:"sunnah",deed:"الحلم والأناة",text:"قال ﷺ لأشجِّ عبد القيس: «إنَّ فيك خَصلتَين يحبُّهما اللهُ: الحِلمُ والأَناةُ»",src:"رواه مسلم",grade:"صحيح",tip:"لا تتعجل في الحكم والرد، وتمهَّل قبل القرار."},
+{id:"s9",t:"sunnah",deed:"التقوى والغنى والخفاء",text:"«إنَّ اللهَ يحبُّ العبدَ التقيَّ الغنيَّ الخفيَّ»",src:"رواه مسلم (٢٩٦٥)",grade:"صحيح",tip:"اجعل لك عملًا صالحًا لا يعلمه أحد."},
+{id:"s10",t:"sunnah",deed:"الجمال",text:"«إنَّ اللهَ جميلٌ يحبُّ الجمالَ»",src:"رواه مسلم (٩١)",grade:"صحيح",tip:"اعتنِ بنظافة ثوبك وحسن هيئتك من غير كبر."},
+{id:"s11",t:"sunnah",deed:"صلاة داود وصيام داود",text:"«أحبُّ الصلاةِ إلى اللهِ صلاةُ داودَ، وأحبُّ الصيامِ إلى اللهِ صيامُ داودَ؛ كان ينامُ نصفَ الليلِ، ويقومُ ثلثَه، وينامُ سُدسَه، ويصومُ يومًا ويُفطرُ يومًا»",src:"متفق عليه: البخاري (١١٣١)، ومسلم (١١٥٩)",grade:"صحيح",tip:"ابدأ بركعتين قبل الفجر، وتدرَّج."},
+{id:"s12",t:"sunnah",deed:"المساجد",text:"«أحبُّ البلادِ إلى اللهِ مساجدُها، وأبغضُ البلادِ إلى اللهِ أسواقُها»",src:"رواه مسلم (٦٧١)",grade:"صحيح",tip:"بكِّر إلى المسجد، واجلس فيه بعد الصلاة قليلًا."},
+{id:"s13",t:"sunnah",deed:"قوة الإيمان",text:"«المؤمنُ القويُّ خيرٌ وأحبُّ إلى اللهِ من المؤمنِ الضعيفِ، وفي كلٍّ خيرٌ، احرِصْ على ما ينفعُك، واستعِنْ باللهِ ولا تعجَزْ»",src:"رواه مسلم (٢٦٦٤)",grade:"صحيح",tip:"احرص على ما ينفعك اليوم، واترك ما لا يعنيك."},
+{id:"s14",t:"sunnah",deed:"محبة سورة الإخلاص",text:"في الرجل الذي كان يختم قراءته بـ﴿قُلْ هُوَ اللَّهُ أَحَدٌ﴾ لأنها صفة الرحمن، قال ﷺ: «أخبِروه أنَّ اللهَ يحبُّه»",src:"متفق عليه: البخاري (٧٣٧٥)، ومسلم (٨١٣)",grade:"صحيح",tip:"تدبَّر سورة الإخلاص، واقرأها بحب لما فيها من صفات الله."},
+{id:"s15",t:"sunnah",deed:"الحب في الله وزيارة الإخوان",text:"«أنَّ رجلًا زار أخًا له في قريةٍ أخرى، فأرصدَ اللهُ له على مَدْرجتِه مَلَكًا … قال: فإني رسولُ اللهِ إليك بأنَّ اللهَ قد أحبَّك كما أحببتَه فيه»",src:"رواه مسلم (٢٥٦٧)",grade:"صحيح",tip:"زُر أخًا لك في الله، أو اتصل به لغير حاجة دنيوية."},
+{id:"s16",t:"sunnah",deed:"المتحابون في الله",text:"«قال اللهُ تبارك وتعالى: وجبتْ محبتي للمتحابِّين فيَّ، والمتجالسين فيَّ، والمتزاورين فيَّ، والمتباذلين فيَّ»",src:"رواه مالك في الموطأ وأحمد، وصححه ابن عبد البر والألباني",grade:"صحيح",tip:"اجلس مع أهل الخير، وابذل لإخوانك."},
+{id:"s17",t:"sunnah",deed:"نفع الناس وإدخال السرور",text:"«أحبُّ الناسِ إلى اللهِ أنفعُهم للناسِ، وأحبُّ الأعمالِ إلى اللهِ سرورٌ تُدخِلُه على مسلمٍ، أو تكشفُ عنه كُربةً، أو تقضي عنه دَينًا، أو تطرُدُ عنه جوعًا …»",src:"رواه الطبراني، وحسّنه الألباني",grade:"حسن",tip:"أدخل السرور على طالب أو جار أو قريب اليوم."},
+{id:"s18",t:"sunnah",deed:"إتقان العمل",text:"«إنَّ اللهَ يحبُّ إذا عمِلَ أحدُكم عملًا أن يُتقنَه»",src:"رواه أبو يعلى والطبراني، وحسّنه الألباني في السلسلة الصحيحة",grade:"حسن",tip:"أتقن تحضير درسك وتصحيح أوراقك احتسابًا."},
+{id:"s19",t:"sunnah",deed:"العمل الصالح في عشر ذي الحجة",text:"«ما من أيامٍ العملُ الصالحُ فيهنَّ أحبُّ إلى اللهِ من هذه الأيامِ العشرِ …»",src:"رواه أبو داود والترمذي، وأصله في البخاري (٩٦٩)",grade:"صحيح",tip:"استعد لها بالصيام والذكر والصدقة إذا أقبلت."},
+{id:"s20",t:"sunnah",deed:"الأخذ برخص الله",text:"«إنَّ اللهَ يحبُّ أن تُؤتى رُخَصُه، كما يكرهُ أن تُؤتى معصيتُه»",src:"رواه أحمد، وصححه ابن حبان والألباني",grade:"صحيح",tip:"اقبل رخصة الله في السفر والمرض شاكرًا."},
+{id:"s21",t:"sunnah",deed:"إظهار أثر النعمة",text:"«إنَّ اللهَ يحبُّ أن يَرى أثرَ نعمتِه على عبدِه»",src:"رواه الترمذي (٢٨١٩) وحسّنه",grade:"حسن",tip:"اشكر الله بلسانك وأظهر نعمته باعتدال."},
+{id:"s22",t:"sunnah",deed:"الوتر",text:"«إنَّ اللهَ وِترٌ يحبُّ الوِترَ»",src:"متفق عليه: البخاري (٦٤١٠)، ومسلم (٢٦٧٧)",grade:"صحيح",tip:"لا تترك صلاة الوتر ولو ركعة واحدة."},
+{id:"s23",t:"sunnah",deed:"أحب الأسماء",text:"«إنَّ أحبَّ أسمائِكم إلى اللهِ عبدُ اللهِ وعبدُ الرحمنِ»",src:"رواه مسلم (٢١٣٢)",grade:"صحيح",tip:"تذكَّر معنى العبودية في اسمك وأسماء من حولك."},
+{id:"s24",t:"sunnah",deed:"العطاس وحمد الله عنده",text:"«إنَّ اللهَ يحبُّ العُطاسَ، ويكرهُ التثاؤبَ …»",src:"رواه البخاري (٦٢٢٣)",grade:"صحيح",tip:"احمد الله إذا عطست، وشمِّت أخاك إذا حمد الله."},
+
+{id:"u1",t:"ulama",deed:"الأسباب العشرة الجالبة لمحبة الله",list:["قراءة القرآن بالتدبر والتفهم لمعانيه","التقرب إلى الله بالنوافل بعد الفرائض","دوام ذكره على كل حال باللسان والقلب والعمل","إيثار محابِّه على محابِّك عند غلبة الهوى","مطالعة القلب لأسمائه وصفاته ومعرفتها","مشاهدة بِرِّه وإحسانه ونعمه الظاهرة والباطنة","انكسار القلب بكليته بين يديه","الخلوة به وقت النزول الإلهي آخر الليل بالمناجاة وتلاوة كلامه","مجالسة المحبين الصادقين والانتفاع بطيب كلامهم","مباعدة كل سبب يحول بين القلب وبين الله"],src:"الإمام ابن القيم، مدارج السالكين — منزلة المحبة (بتصرف يسير في العبارة)",grade:"من كتابه",tip:"اختر سببًا واحدًا كل أسبوع واعمل به."},
+{id:"u2",t:"ulama",deed:"لذة محبة الله في الدنيا",text:"«إنَّ في الدنيا جنةً، مَن لم يدخلها لم يدخل جنةَ الآخرة»",src:"شيخ الإسلام ابن تيمية، نقله عنه تلميذه ابن القيم في الوابل الصيب",grade:"نقل تلميذه عنه",tip:"ابحث عن لذة قلبك في الصلاة والذكر."},
+{id:"u3",t:"ulama",deed:"النية",text:"«رُبَّ عملٍ صغيرٍ تُعظِّمه النيةُ، ورُبَّ عملٍ كبيرٍ تُصغِّره النيةُ»",src:"الإمام عبد الله بن المبارك، ذكره ابن رجب في جامع العلوم والحكم",grade:"منقول بإسناده في كتب الزهد",tip:"استحضر نية صالحة قبل كل عمل عادي."},
+{id:"u4",t:"ulama",deed:"الإخلاص",text:"«لا يجتمع الإخلاصُ في القلب ومحبةُ المدح والثناء والطمعُ فيما عند الناس، إلا كما يجتمع الماءُ والنارُ والضبُّ والحوتُ»",src:"الإمام ابن القيم، الفوائد",grade:"من كتابه",tip:"اعمل لله، ولا تنتظر مدح الناس."},
+
+{id:"w1",t:"warn",deed:"«إنَّ اللهَ يحبُّ الملحِّين في الدعاء»",text:"حديث مشهور على الألسنة، ولا يصح عن النبي ﷺ.",src:"ضعّفه أهل العلم بالحديث. ومعنى الإلحاح في الدعاء ثابت بأدلة صحيحة أخرى.",grade:"ضعيف",tip:"لا تنسبه إلى النبي ﷺ، واستدل بالأحاديث الصحيحة في الدعاء."},
+{id:"w2",t:"warn",deed:"«إنَّ اللهَ يحبُّ المؤمنَ المُحترِف»",text:"يُروى في فضل الحِرفة والعمل، ولا يصح.",src:"ضعّفه أهل العلم بالحديث. ويغني عنه: «ما أكل أحدٌ طعامًا قطُّ خيرًا من أن يأكل من عمل يده» رواه البخاري.",grade:"ضعيف",tip:"انشر الصحيح بدلًا منه."}
+];
+const MT={quran:"من القرآن",sunnah:"من السنة",ulama:"من أقوال العلماء",warn:"لا يصح"};
+function mahabToday(){const pool=MAHAB.filter(d=>d.t!=="warn"&&d.text);return pool[dayNum(cur)%pool.length]}
+let mFilter="all";
+function renderMahab(body,title,k){
+  S();state.mfav=state.mfav||[];title.textContent="محابّ الله";
+  const t=mahabToday();const done=dayList(k).includes("mahab");
+  const top=document.createElement("div");top.className="wbox";
+  top.innerHTML="<span class='bh-l'>عمل يحبه الله لهذا اليوم</span><div class='wbig'><b></b></div><p class='bh-q' style='margin:0'></p><small class='sub-t'></small><p class='mh-tip'></p>";
+  top.querySelector("b").textContent=t.deed;top.querySelector(".bh-q").textContent=t.text;top.querySelector("small").textContent=t.src+(t.grade?" · "+t.grade:"");
+  top.querySelector(".mh-tip").textContent="تطبيق عملي: "+t.tip;
+  const bt=document.createElement("button");bt.type="button";bt.className="big"+(done?" ghost":"");bt.textContent=done?"تراجع عن تسجيله اليوم":"عملتُ بعمل يحبه الله اليوم ✓";
+  bt.onclick=()=>{setDone(k,"mahab",!done);save();renderSheet()};top.appendChild(bt);body.appendChild(top);
+  const ch=document.createElement("div");ch.className="chips";ch.style.position="static";
+  [["all","الكل"],["quran",MT.quran],["sunnah",MT.sunnah],["ulama",MT.ulama],["fav","المحفوظة"],["warn","تنبيهات: لا تصح"]].forEach(([key,lab])=>{
+    const c=document.createElement("button");c.type="button";c.className="chip";c.style.setProperty("--hue","var(--gold)");c.textContent=lab;c.setAttribute("aria-pressed",mFilter===key);
+    if(mFilter===key)c.style.borderColor="var(--gold)";c.onclick=()=>{mFilter=key;renderSheet()};ch.appendChild(c)});
+  body.appendChild(ch);
+  const items=MAHAB.filter(d=>mFilter==="fav"?state.mfav.includes(d.id):mFilter==="all"?d.t!=="warn":d.t===mFilter);
+  if(!items.length){const e=document.createElement("p");e.className="sub-t";e.textContent="لا توجد عناصر محفوظة بعد. اضغط ☆ على أي عمل لحفظه.";body.appendChild(e)}
+  items.forEach(d=>{
+    const c=document.createElement("div");c.className="bh"+(d.t==="warn"?" mh-warn":"");
+    c.innerHTML="<div class='mh-top'><span class='bh-l'></span><button type='button' class='mh-fav'></button></div><p class='mh-deed'></p>";
+    c.querySelector(".bh-l").textContent=MT[d.t];c.querySelector(".mh-deed").textContent=d.deed;
+    if(d.list){const ol=document.createElement("ol");ol.className="mh-list";d.list.forEach(x=>{const li=document.createElement("li");li.textContent=x;ol.appendChild(li)});c.appendChild(ol)}
+    else if(d.text){const pp=document.createElement("p");pp.className="bh-q";pp.textContent=d.text;c.appendChild(pp)}
+    const sm=document.createElement("small");sm.textContent=d.src+(d.grade?" · "+d.grade:"");c.appendChild(sm);
+    if(d.tip){const tp=document.createElement("p");tp.className="mh-tip";tp.textContent=(d.t==="warn"?"تنبيه: ":"تطبيق عملي: ")+d.tip;c.appendChild(tp)}
+    const fv=c.querySelector(".mh-fav");const isF=state.mfav.includes(d.id);fv.textContent=isF?"★":"☆";fv.setAttribute("aria-label",isF?"إزالة من المحفوظة":"حفظ");
+    fv.onclick=()=>{state.mfav=isF?state.mfav.filter(x=>x!==d.id):state.mfav.concat(d.id);save();renderSheet()};
+    body.appendChild(c)});
+}
 function fmt(d,opt,cal){try{return new Intl.DateTimeFormat("ar-SA"+(cal||""),opt).format(d)}catch(e){return d.toLocaleDateString()}}
 
 let notesKey=null;
@@ -998,6 +1086,7 @@ function itemEl(k,it,gid){
   const b=document.createElement("button");b.type="button";b.className="tick";b.setAttribute("aria-pressed",on);
   let sm=it.s;
   if(it.panel==="bahr"){const b=bahrS();const d=BAHR[b.cur];sm="اليوم "+toAr(b.cur+1)+" من ٤٠ · "+d.t}
+  if(it.panel==="mahab"){const t=mahabToday();sm="عمل اليوم: "+t.deed}
   if(it.panel==="hadith")sm=state.hadith?"الحديث رقم "+toAr(state.hadith.n)+" من ٧٥٦٣":"حديث كل يوم من صحيح البخاري";
   if(it.panel==="wird")sm=state.wird?"الصفحة "+toAr(state.wird.page)+" · الجزء "+toAr(juzOf(state.wird.page)):"حدّد وردك وتابع ختمتك";
   if(gid==="guard"&&on)sm="سلِمت اليوم ✓";
@@ -1005,7 +1094,7 @@ function itemEl(k,it,gid){
   b.innerHTML="<span class='ck'></span><span class='tt'><b></b>"+(sm?"<small></small>":"")+"</span>";
   b.querySelector("b").textContent=it.t;if(sm)b.querySelector("small").textContent=sm;
   b.onclick=()=>toggleItem(k,it);row.appendChild(b);
-  if(it.panel){const o=document.createElement("button");o.type="button";o.className="open";o.textContent=it.panel==="wird"?"الورد":it.panel==="mutlaq"?"العدّاد":it.panel==="bahr"?"ورد اليوم":"اقرأ";o.onclick=()=>openSheet(it.panel);row.appendChild(o)}
+  if(it.panel){const o=document.createElement("button");o.type="button";o.className="open";o.textContent=it.panel==="wird"?"الورد":it.panel==="mutlaq"?"العدّاد":it.panel==="bahr"?"ورد اليوم":it.panel==="mahab"?"افتح":"اقرأ";o.onclick=()=>openSheet(it.panel);row.appendChild(o)}
   const key=gid+":"+it.id;
   if(it.subs){
     const n=it.subs.filter(s=>list.includes(s[0])).length;
@@ -1123,6 +1212,7 @@ document.getElementById("gplus").onclick=()=>{if(state.goal<visibleCount()){stat
 document.getElementById("bReview").onclick=()=>openSheet("review");
 document.getElementById("bCustom").onclick=()=>openSheet("custom");
 document.getElementById("bDuas").onclick=()=>openSheet("duas");
+document.getElementById("bMahab").onclick=()=>openSheet("mahab");
 document.getElementById("bBackup").onclick=()=>openSheet("backup");
 document.getElementById("moreAll").onclick=()=>{state.showAll=!state.showAll;save();render()};
 document.querySelectorAll(".sk").forEach(b=>b.onclick=()=>{state.skin=b.dataset.s;save();render()});
