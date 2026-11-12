@@ -1,8 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "io.github.abdoumath2016_ctrl.twa",
-    "sha256_cert_fingerprints": ["85:A9:2F:A2:FC:26:EB:F5:BD:B9:A0:E3:CB:90:64:91:95:22:03:7C:95:A7:10:93:C5:63:7F:85:CC:DC:EA:33"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.abdoumath2016_ctrl.twa",
+      "sha256_cert_fingerprints": [
+        "85:A9:2F:A2:FC:26:EB:F5:BD:B9:A0:E3:CB:90:64:91:95:22:03:7C:95:A7:10:93:C5:63:7F:85:CC:DC:EA:33",
+        "E9:24:13:6F:BD:77:F8:A0:B2:43:47:C9:19:AD:B8:34:AC:BD:7F:D9:7D:A9:1C:22:F6:24:1D:01:2B:1D:54:B5"
+      ]
+    }
   }
-}]
+]
