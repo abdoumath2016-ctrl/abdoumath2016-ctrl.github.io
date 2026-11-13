@@ -355,6 +355,18 @@ h1 em{font-style:normal;color:var(--gold)}
 
 @media (max-width:400px){.hero{gap:12px}.ring{width:96px;height:96px}.ring .num b{font-size:1.7rem}.pr{font-size:.8rem}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+/* إصلاح عرض النوافذ على جميع الجوالات (المتصفحات القديمة وتكبير الخط) */
+html,body{max-width:100%;overflow-x:hidden}
+.sheet{top:0;right:0;bottom:0;left:0;width:100%;max-width:100vw;overflow-x:hidden}
+.shead{padding-top:14px;padding-bottom:14px;width:100%}
+.sbody{width:100%;min-width:0}
+.sbody>*{max-width:100%;min-width:0}
+.week{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.prow{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.pr{min-width:0;overflow:hidden}
+.d{min-width:0;overflow:hidden;font-size:.66rem;padding:8px 0;white-space:nowrap;text-overflow:clip}
+.dk{display:block;width:100%;max-width:100%;min-width:0;white-space:normal}
+.dk p,.wbox,.bh,.bh p{max-width:100%;overflow-wrap:anywhere;word-break:normal}
 </style>
 
 </head>
