@@ -373,10 +373,10 @@ html,body{max-width:100%;overflow-x:hidden}
 .ptc .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
 .ptc .pcity{color:var(--muted);font-size:.8rem}
 .ptc .pgear{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:3px 12px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
-.ptrow{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
-.ptrow div{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:7px 1px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
-.ptrow span{font-size:.72rem;color:var(--muted)}
-.ptrow b{font-size:.8rem;font-weight:700;white-space:nowrap;direction:rtl}
+.ptrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ptrow div{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.ptrow span{font-size:.85rem;color:var(--muted)}
+.ptrow b{font-size:1.15rem;font-weight:700;white-space:nowrap;direction:rtl;line-height:1.3}.ptrow b small{font-size:.75rem;font-weight:600;color:var(--muted);margin-right:3px}.ptrow div.nx b small{color:var(--gold)}
 .ptrow div.nx{border-color:var(--gold);background:var(--gold-soft)}.ptrow div.nx span,.ptrow div.nx b{color:var(--gold)}
 .ptnext{margin:10px 0 0;font-size:.9rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
 .ptnext b{color:var(--gold)}
@@ -399,7 +399,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .adbox .big{font-size:2.6rem;line-height:1}
 .adbox button{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 34px;font:inherit;font-weight:700;font-size:1rem;cursor:pointer}
 .adbox button.sec2{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
-@media (max-width:380px){.ptrow b{font-size:.72rem}.ptrow span{font-size:.66rem}}
+@media (max-width:360px){.ptrow b{font-size:1rem}}
 </style>
 </head>
 <body>
@@ -1386,7 +1386,7 @@ function render(){
  if(!st.loc){box.innerHTML=`<div class="phead"><b>مواقيت الصلاة</b></div><div class="ptstart">حدّد موقعك لتظهر مواقيت الصلاة، ويُنبّهك التطبيق بالتكبير عند دخول الوقت.<div class="btns" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="ok" id="ptGps">📍 موقعي الحالي</button></div><select id="ptCity" style="font:inherit;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 8px">${cityOpts()}</select><span class="ptmsg" id="ptMsg"></span></div>`;bind();return}
  times();const [nk,nt]=nextP();
  let h=`<div class="phead"><b>مواقيت الصلاة</b><span class="pcity">${st.loc.n}</span><button type="button" class="pgear" id="ptGear" aria-expanded="${setOpen}">${setOpen?"إغلاق":"الإعدادات"}</button></div><div class="ptrow">`;
- for(const k of ORDER)h+=`<div class="${k===nk?"nx":""}"><span>${NAMES[k]}</span><b>${fmtT(today[k]).replace(/\s/g," ")}</b></div>`;
+ for(const k of ORDER)h+=`<div class="${k===nk?"nx":""}"><span>${NAMES[k]}</span><b>${fmtT(today[k]).replace(/\s*([صم])\s*$/,"<small>$1</small>")}</b></div>`;
  h+=`</div><p class="ptnext" id="ptNext"></p>`;
  if(setOpen){
   h+=`<div class="ptset"><label>المدينة<select id="ptCity">${cityOpts()}</select></label><div class="btns"><button type="button" id="ptGps">📍 استخدم موقعي الحالي</button></div><span class="ptmsg" id="ptMsg"></span>
