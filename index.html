@@ -369,6 +369,38 @@ html,body{max-width:100%;overflow-x:hidden}
 .dk p,.wbox,.bh,.bh p{max-width:100%;overflow-wrap:anywhere;word-break:normal}
 </style>
 
+<style>
+.ptc .phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.ptc .pcity{color:var(--muted);font-size:.8rem}
+.ptc .pgear{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:3px 12px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
+.ptrow{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.ptrow div{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:7px 1px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.ptrow span{font-size:.72rem;color:var(--muted)}
+.ptrow b{font-size:.8rem;font-weight:700;white-space:nowrap;direction:rtl}
+.ptrow div.nx{border-color:var(--gold);background:var(--gold-soft)}.ptrow div.nx span,.ptrow div.nx b{color:var(--gold)}
+.ptnext{margin:10px 0 0;font-size:.9rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.ptnext b{color:var(--gold)}
+.ptnext .bell{border:0;background:none;color:var(--muted);font:inherit;font-size:.8rem;cursor:pointer;padding:0}
+.ptset{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px;font-size:.88rem}
+.ptset label{display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+.ptset select{font:inherit;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 8px}
+.ptset .btns{display:flex;gap:8px;flex-wrap:wrap}
+.ptset .btns button,.ptstart button{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer}
+.ptset .btns button.ok,.ptstart button.ok{background:var(--accent);border-color:var(--accent);color:#fff}
+.ptadj{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.ptadj div{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--soft);border-radius:10px;padding:5px 0;font-size:.75rem}
+.ptadj button{width:26px;height:22px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;line-height:1;cursor:pointer;padding:0}
+.ptstart{display:flex;flex-direction:column;gap:8px;font-size:.88rem;color:var(--muted)}
+.ptmsg{font-size:.8rem;color:var(--must)}
+.adov{position:fixed;inset:0;z-index:60;background:rgba(5,25,19,.93);display:flex;align-items:center;justify-content:center;padding:24px}
+.adbox{background:var(--card);border:2px solid var(--gold);border-radius:26px;padding:26px 20px;max-width:380px;width:100%;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.adbox h2{margin:0;font-family:"Scheherazade New","Amiri",serif;font-size:1.9rem;color:var(--gold);line-height:1.4}
+.adbox p{margin:0;font-size:1.05rem;line-height:1.9}
+.adbox .big{font-size:2.6rem;line-height:1}
+.adbox button{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:10px 34px;font:inherit;font-weight:700;font-size:1rem;cursor:pointer}
+.adbox button.sec2{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+@media (max-width:380px){.ptrow b{font-size:.72rem}.ptrow span{font-size:.66rem}}
+</style>
 </head>
 <body>
 <div class="band notranslate" translate="no" lang="ar"><div class="in">
@@ -1280,6 +1312,153 @@ load();render();
   document.getElementById("savenote").textContent="تُحفظ اختياراتك في حسابك تلقائيًا، وتظهر على أي جهاز";
 }catch(e){}finally{maybeWelcome()}})();
 
+</script>
+
+<script>
+/* مواقيت الصلاة + تنبيه التكبير — زاد اليوم */
+(function(){
+const KEY="zadPT",LAST="zadPTlast";
+const NAMES={fajr:"الفجر",sunrise:"الشروق",dhuhr:"الظهر",asr:"العصر",maghrib:"المغرب",isha:"العشاء"};
+const ORDER=["fajr","sunrise","dhuhr","asr","maghrib","isha"];
+const FARD=["fajr","dhuhr","asr","maghrib","isha"];
+const METHODS={
+ uq:{n:"أم القرى (السعودية)",f:18.5,im:90},
+ egypt:{n:"الهيئة المصرية العامة للمساحة",f:19.5,i:17.5},
+ mwl:{n:"رابطة العالم الإسلامي",f:18,i:17},
+ gulf:{n:"الخليج (الإمارات وقطر وعُمان والبحرين)",f:19.5,im:90},
+ kuwait:{n:"الكويت",f:18,i:17.5},
+ isna:{n:"أمريكا الشمالية (ISNA)",f:15,i:15},
+ karachi:{n:"كراتشي (باكستان والهند)",f:18,i:18},
+ sea:{n:"ماليزيا وإندونيسيا",f:20,i:18}
+};
+const CC={SA:"uq",EG:"egypt",KW:"kuwait",QA:"gulf",AE:"gulf",BH:"gulf",OM:"gulf",US:"isna",CA:"isna",PK:"karachi",BD:"karachi",IN:"karachi",MY:"sea",ID:"sea"};
+const C=(n,la,lo,c)=>({n,la,lo,c});
+const CITIES=[
+ ["السعودية",[C("الرياض",24.7136,46.6753,"SA"),C("مكة المكرمة",21.4225,39.8262,"SA"),C("المدينة المنورة",24.4672,39.6111,"SA"),C("جدة",21.5433,39.1728,"SA"),C("الدمام",26.4207,50.0888,"SA"),C("الأحساء",25.38,49.588,"SA"),C("حفر الباطن",28.4328,45.9708,"SA"),C("بريدة",26.326,43.975,"SA"),C("حائل",27.5114,41.7208,"SA"),C("تبوك",28.3835,36.5662,"SA"),C("الطائف",21.2703,40.4158,"SA"),C("أبها",18.2164,42.5053,"SA"),C("جازان",16.8892,42.5511,"SA"),C("نجران",17.4924,44.1277,"SA"),C("الباحة",20.0129,41.4677,"SA"),C("سكاكا",29.9697,40.2064,"SA"),C("عرعر",30.9753,41.0381,"SA"),C("ينبع",24.0895,38.0618,"SA"),C("الجبيل",27.0046,49.646,"SA"),C("الخرج",24.1556,47.3346,"SA")]],
+ ["مصر",[C("القاهرة",30.0444,31.2357,"EG"),C("الجيزة",30.0131,31.2089,"EG"),C("الإسكندرية",31.2001,29.9187,"EG"),C("المنصورة",31.0409,31.3785,"EG"),C("طنطا",30.7865,31.0004,"EG"),C("الزقازيق",30.5877,31.502,"EG"),C("شبين الكوم",30.5503,31.0106,"EG"),C("بنها",30.4659,31.1848,"EG"),C("كفر الشيخ",31.1107,30.9388,"EG"),C("دمنهور",31.0341,30.4682,"EG"),C("دمياط",31.4165,31.8133,"EG"),C("بورسعيد",31.2653,32.3019,"EG"),C("الإسماعيلية",30.5965,32.2715,"EG"),C("السويس",29.9668,32.5498,"EG"),C("الفيوم",29.3084,30.8428,"EG"),C("بني سويف",29.0661,31.0994,"EG"),C("المنيا",28.0871,30.7618,"EG"),C("أسيوط",27.1783,31.1859,"EG"),C("سوهاج",26.5591,31.6957,"EG"),C("قنا",26.1551,32.716,"EG"),C("الأقصر",25.6872,32.6396,"EG"),C("أسوان",24.0889,32.8998,"EG"),C("الغردقة",27.2579,33.8116,"EG"),C("مرسى مطروح",31.3543,27.2373,"EG"),C("العريش",31.1316,33.7984,"EG")]],
+ ["الخليج واليمن",[C("الكويت",29.3759,47.9774,"KW"),C("الدوحة",25.2854,51.531,"QA"),C("دبي",25.2048,55.2708,"AE"),C("أبوظبي",24.4539,54.3773,"AE"),C("الشارقة",25.3463,55.4209,"AE"),C("المنامة",26.2285,50.586,"BH"),C("مسقط",23.588,58.3829,"OM"),C("صنعاء",15.3694,44.191,"YE"),C("عدن",12.7855,45.0187,"YE")]],
+ ["الشام والعراق",[C("عمّان",31.9454,35.9284,"JO"),C("القدس",31.7683,35.2137,"PS"),C("غزة",31.5017,34.4668,"PS"),C("دمشق",33.5138,36.2765,"SY"),C("حلب",36.2021,37.1343,"SY"),C("بيروت",33.8938,35.5018,"LB"),C("بغداد",33.3152,44.3661,"IQ"),C("البصرة",30.5085,47.7804,"IQ")]],
+ ["المغرب العربي والسودان",[C("الخرطوم",15.5007,32.5599,"SD"),C("طرابلس",32.8872,13.1913,"LY"),C("بنغازي",32.1167,20.0667,"LY"),C("تونس",36.8065,10.1815,"TN"),C("الجزائر",36.7538,3.0588,"DZ"),C("الرباط",34.0209,-6.8416,"MA"),C("الدار البيضاء",33.5731,-7.5898,"MA"),C("نواكشوط",18.0735,-15.9582,"MR"),C("مقديشو",2.0469,45.3182,"SO")]],
+ ["بلاد العالم",[C("إسطنبول",41.0082,28.9784,"TR"),C("أنقرة",39.9334,32.8597,"TR"),C("كراتشي",24.8607,67.0011,"PK"),C("إسلام آباد",33.6844,73.0479,"PK"),C("دكا",23.8103,90.4125,"BD"),C("نيودلهي",28.6139,77.209,"IN"),C("كوالالمبور",3.139,101.6869,"MY"),C("جاكرتا",-6.2088,106.8456,"ID"),C("لندن",51.5074,-0.1278,"GB"),C("باريس",48.8566,2.3522,"FR"),C("برلين",52.52,13.405,"DE"),C("أمستردام",52.3676,4.9041,"NL"),C("بروكسل",50.8503,4.3517,"BE"),C("ستوكهولم",59.3293,18.0686,"SE"),C("روما",41.9028,12.4964,"IT"),C("مدريد",40.4168,-3.7038,"ES"),C("نيويورك",40.7128,-74.006,"US"),C("شيكاغو",41.8781,-87.6298,"US"),C("هيوستن",29.7604,-95.3698,"US"),C("لوس أنجلوس",34.0522,-118.2437,"US"),C("تورونتو",43.6532,-79.3832,"CA"),C("مونتريال",45.5017,-73.5673,"CA"),C("سيدني",-33.8688,151.2093,"AU"),C("جوهانسبرغ",-26.2041,28.0473,"ZA"),C("لاغوس",6.5244,3.3792,"NG")]]
+];
+const TZM={"Asia/Riyadh":"uq","Africa/Cairo":"egypt","Asia/Kuwait":"kuwait","Asia/Qatar":"gulf","Asia/Dubai":"gulf","Asia/Bahrain":"gulf","Asia/Muscat":"gulf","Asia/Karachi":"karachi","Asia/Dhaka":"karachi","Asia/Kolkata":"karachi","Asia/Calcutta":"karachi","Asia/Kuala_Lumpur":"sea","Asia/Jakarta":"sea"};
+function tzMethod(){let z="";try{z=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}if(TZM[z])return TZM[z];if(/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Detroit|Anchorage)/.test(z))return"isna";return"mwl"}
+
+let st={};try{st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){st={}}
+st.adj=st.adj||{fajr:0,dhuhr:0,asr:0,maghrib:0,isha:0};if(st.on===undefined)st.on=true;st.method=st.method||"auto";st.asr=st.asr||1;
+function sv(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function methodKey(){if(st.method!=="auto")return st.method;if(st.loc&&st.loc.c&&CC[st.loc.c])return CC[st.loc.c];if(st.loc&&st.loc.c)return"mwl";return tzMethod()}
+
+/* ---------- الحساب الفلكي ---------- */
+const R=Math.PI/180,sin=d=>Math.sin(d*R),cos=d=>Math.cos(d*R),tan=d=>Math.tan(d*R),asin=x=>Math.asin(x)/R,acos=x=>Math.acos(x)/R,atan2=(y,x)=>Math.atan2(y,x)/R,acot=x=>Math.atan(1/x)/R;
+const fixA=a=>{a=a-360*Math.floor(a/360);return a<0?a+360:a},fixH=a=>{a=a-24*Math.floor(a/24);return a<0?a+24:a};
+function julian(y,m,d){if(m<=2){y-=1;m+=12}const A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5}
+function sunPos(jd){const D=jd-2451545,g=fixA(357.529+0.98560028*D),q=fixA(280.459+0.98564736*D),L=fixA(q+1.915*sin(g)+0.02*sin(2*g)),e=23.439-0.00000036*D,RA=atan2(cos(e)*sin(L),cos(L))/15;return{eqt:q/15-fixH(RA),decl:asin(sin(e)*sin(L))}}
+function isRamadan(dt){try{return +new Intl.DateTimeFormat("en-u-ca-islamic-umalqura",{month:"numeric"}).format(dt).replace(/\D/g,"")===9}catch(e){return false}}
+function calc(dt,lat,lng){
+ const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate(),M=METHODS[methodKey()],jd0=julian(y,m,d)-lng/(15*24);
+ const mid=t=>fixH(12-sunPos(jd0+t).eqt);
+ const ang=(a,t,ccw)=>{const dc=sunPos(jd0+t).decl,n=mid(t),T=acos((-sin(a)-sin(dc)*sin(lat))/(cos(dc)*cos(lat)))/15;return n+(ccw?-T:T)};
+ const asrT=(f,t)=>{const dc=sunPos(jd0+t).decl;return ang(-acot(f+tan(Math.abs(lat-dc))),t)};
+ let t={fajr:5,sunrise:6,dhuhr:12,asr:13,sunset:18,isha:18};
+ for(let k=0;k<2;k++){const p={};for(const x in t)p[x]=t[x]/24;
+  t={fajr:ang(M.f,p.fajr,1),sunrise:ang(0.833,p.sunrise,1),dhuhr:mid(p.dhuhr),asr:asrT(st.asr,p.asr),sunset:ang(0.833,p.sunset),isha:M.i?ang(M.i,p.isha):NaN}}
+ const night=24-(t.sunset-t.sunrise);
+ if(isNaN(t.fajr)||t.sunrise-t.fajr>M.f/60*night)t.fajr=t.sunrise-M.f/60*night;
+ if(M.im)t.isha=t.sunset+(M.im+(methodKey()==="uq"&&isRamadan(dt)?30:0))/60;
+ else if(isNaN(t.isha)||t.isha-t.sunset>M.i/60*night)t.isha=t.sunset+M.i/60*night;
+ t.maghrib=t.sunset;
+ const base=Date.UTC(y,m-1,d),out={};
+ for(const k of ORDER){let h=t[k]-lng/15+((st.adj[k]||0)/60);out[k]=new Date(base+Math.round(h*60)*60000)}
+ return out;
+}
+
+/* ---------- الواجهة ---------- */
+const $=id=>document.getElementById(id);
+const fmtT=d=>{try{return d.toLocaleTimeString("ar-EG",{hour:"numeric",minute:"2-digit"})}catch(e){return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")}};
+const ar=n=>String(n).replace(/\d/g,x=>"٠١٢٣٤٥٦٧٨٩"[x]);
+function cityOpts(){let h='<option value="">— اختر مدينتك —</option>';CITIES.forEach(([g,list],gi)=>{h+=`<optgroup label="${g}">`+list.map((c,ci)=>`<option value="${gi}:${ci}"${st.loc&&st.loc.n===c.n&&!st.loc.gps?" selected":""}>${c.n}</option>`).join("")+"</optgroup>"});return h}
+let today=null,tom=null,dayKey="",setOpen=false;
+function times(){const now=new Date(),k=now.toDateString();if(k!==dayKey||!today){dayKey=k;today=calc(now,st.loc.la,st.loc.lo);const t2=new Date(now);t2.setDate(t2.getDate()+1);tom=calc(t2,st.loc.la,st.loc.lo)}}
+function nextP(){const now=new Date();for(const k of ORDER){if(k==="sunrise")continue;if(today[k]>now)return[k,today[k]]}return["fajr",tom.fajr]}
+function render(){
+ const box=$("ptBox");if(!box)return;
+ if(!st.loc){box.innerHTML=`<div class="phead"><b>مواقيت الصلاة</b></div><div class="ptstart">حدّد موقعك لتظهر مواقيت الصلاة، ويُنبّهك التطبيق بالتكبير عند دخول الوقت.<div class="btns" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="ok" id="ptGps">📍 موقعي الحالي</button></div><select id="ptCity" style="font:inherit;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 8px">${cityOpts()}</select><span class="ptmsg" id="ptMsg"></span></div>`;bind();return}
+ times();const [nk,nt]=nextP();
+ let h=`<div class="phead"><b>مواقيت الصلاة</b><span class="pcity">${st.loc.n}</span><button type="button" class="pgear" id="ptGear" aria-expanded="${setOpen}">${setOpen?"إغلاق":"الإعدادات"}</button></div><div class="ptrow">`;
+ for(const k of ORDER)h+=`<div class="${k===nk?"nx":""}"><span>${NAMES[k]}</span><b>${fmtT(today[k]).replace(/\s/g," ")}</b></div>`;
+ h+=`</div><p class="ptnext" id="ptNext"></p>`;
+ if(setOpen){
+  h+=`<div class="ptset"><label>المدينة<select id="ptCity">${cityOpts()}</select></label><div class="btns"><button type="button" id="ptGps">📍 استخدم موقعي الحالي</button></div><span class="ptmsg" id="ptMsg"></span>
+  <label>طريقة الحساب<select id="ptMeth"><option value="auto">تلقائي حسب البلد (${METHODS[st.loc&&st.loc.c&&CC[st.loc.c]||(st.loc&&st.loc.c?"mwl":tzMethod())].n})</option>${Object.keys(METHODS).map(k=>`<option value="${k}"${st.method===k?" selected":""}>${METHODS[k].n}</option>`).join("")}</select></label>
+  <label>وقت العصر<select id="ptAsr"><option value="1"${st.asr==1?" selected":""}>الجمهور (المثل)</option><option value="2"${st.asr==2?" selected":""}>الحنفي (المثلين)</option></select></label>
+  <div style="color:var(--muted)">تعديل يدوي بالدقائق (إن خالف مسجدَك):</div><div class="ptadj">${FARD.map(k=>`<div>${NAMES[k]}<button type="button" data-a="${k}" data-v="1">+</button><b>${ar(st.adj[k]||0)}</b><button type="button" data-a="${k}" data-v="-1">−</button></div>`).join("")}</div>
+  <div class="btns"><button type="button" id="ptOn" class="${st.on?"ok":""}">${st.on?"🔔 تنبيه التكبير: مفعّل":"🔕 تنبيه التكبير: موقوف"}</button><button type="button" id="ptTest">▶ تجربة التنبيه</button></div>
+  <small style="color:var(--muted);line-height:1.7">يعمل التنبيه والتطبيق مفتوح. التوقيت حسب ساعة جوالك، فتأكد أنها مضبوطة على توقيت بلدك.</small></div>`}
+ box.innerHTML=h;
+ if(setOpen){const m=$("ptMeth");if(m)m.value=st.method}
+ tick();bind();
+}
+function tick(){
+ const el=$("ptNext");if(!el||!st.loc)return;times();const [k,t]=nextP();let mins=Math.ceil((t-new Date())/60000);if(mins<0)mins=0;
+ const hh=Math.floor(mins/60),mm=mins%60;
+ const left=hh?`${ar(hh)} س ${ar(mm)} د`:`${ar(mm)} دقيقة`;
+ el.innerHTML=`<span>الصلاة القادمة: <b>${NAMES[k]}</b> بعد <b>${left}</b></span><button type="button" class="bell" id="ptBell">${st.on?"🔔 التنبيه مفعّل":"🔕 التنبيه موقوف"}</button>`;
+ $("ptBell").onclick=()=>{st.on=!st.on;sv();if(st.on)prime();render()};
+ const row=document.querySelectorAll(".ptrow div");row.forEach((d,i)=>d.classList.toggle("nx",ORDER[i]===k));
+}
+function setLoc(l){st.loc=l;sv();dayKey="";render()}
+function bind(){
+ const g=$("ptGear");if(g)g.onclick=()=>{setOpen=!setOpen;render()};
+ const c=$("ptCity");if(c)c.onchange=()=>{if(!c.value)return;const[a,b]=c.value.split(":").map(Number);const x=CITIES[a][1][b];prime();setLoc({n:x.n,la:x.la,lo:x.lo,c:x.c})};
+ const gp=$("ptGps");if(gp)gp.onclick=()=>{prime();const msg=$("ptMsg");if(!navigator.geolocation){msg.textContent="جوالك لا يدعم تحديد الموقع، اختر مدينتك من القائمة.";return}
+  msg.textContent="جارٍ تحديد موقعك…";navigator.geolocation.getCurrentPosition(p=>{setLoc({n:"موقعي الحالي",la:+p.coords.latitude.toFixed(4),lo:+p.coords.longitude.toFixed(4),gps:1})},()=>{const m=$("ptMsg");if(m)m.textContent="لم نتمكن من تحديد موقعك، اختر مدينتك من القائمة."},{timeout:15000,maximumAge:3600000})};
+ const me=$("ptMeth");if(me)me.onchange=()=>{st.method=me.value;sv();dayKey="";render()};
+ const as=$("ptAsr");if(as)as.onchange=()=>{st.asr=+as.value;sv();dayKey="";render()};
+ document.querySelectorAll(".ptadj button").forEach(b=>b.onclick=()=>{const k=b.dataset.a;st.adj[k]=Math.max(-30,Math.min(30,(st.adj[k]||0)+ +b.dataset.v));sv();dayKey="";render()});
+ const on=$("ptOn");if(on)on.onclick=()=>{st.on=!st.on;sv();if(st.on)prime();render()};
+ const ts=$("ptTest");if(ts)ts.onclick=()=>{prime();alertP(nextP()[0],true)};
+}
+
+/* ---------- الصوت والتنبيه ---------- */
+let au=null,primed=false;
+function getAu(){if(!au){au=new Audio("adhan_takbir.mp3");au.preload="auto"}return au}
+function prime(){if(primed)return;primed=true;try{const a=getAu();a.muted=true;const p=a.play();if(p&&p.then)p.then(()=>{a.pause();a.currentTime=0;a.muted=false}).catch(()=>{a.muted=false;primed=false})}catch(e){primed=false}}
+["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(st.on&&st.loc)prime()},{once:false,passive:true}));
+function close(){const o=$("adOv");if(o)o.remove();if(au){au.pause();au.currentTime=0}}
+function remind(k){
+ const b=$("adBox");if(!b)return;
+ b.innerHTML=`<div class="big">🔕</div><h2>حان وقت صلاة ${NAMES[k]}</h2><p>ضع جوالك على الصامت،<br>وتوجّه إلى الصلاة،<br>تقبّل الله منك 🤍</p><button type="button" id="adDone">تم</button>`;
+ $("adDone").onclick=close;
+}
+function alertP(k,test){
+ close();
+ const o=document.createElement("div");o.className="adov notranslate";o.id="adOv";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("translate","no");
+ o.innerHTML=`<div class="adbox" id="adBox"><div class="big">🕌</div><h2>حان الآن وقت صلاة ${NAMES[k]}</h2><p>اللهُ أكبرُ، اللهُ أكبرُ<br>اللهُ أكبرُ، اللهُ أكبرُ</p><button type="button" id="adStop">إيقاف التكبير</button></div>`;
+ document.body.appendChild(o);
+ const a=getAu();a.muted=false;a.currentTime=0;a.onended=()=>remind(k);
+ const p=a.play();
+ if(p&&p.catch)p.catch(()=>{const s=$("adStop");if(s){s.textContent="▶ تشغيل التكبير";s.onclick=()=>{a.play().catch(()=>remind(k));s.textContent="إيقاف التكبير";s.onclick=()=>{a.pause();remind(k)}}}});
+ $("adStop").onclick=()=>{a.pause();remind(k)};
+}
+function check(){
+ if(!st.loc)return;times();tick();
+ if(!st.on)return;const now=new Date();
+ for(const k of FARD){const t=today[k],id=t.toDateString()+k,diff=now-t;
+  if(diff>=0&&diff<10*60000){let last="";try{last=localStorage.getItem(LAST)||""}catch(e){}if(last!==id){try{localStorage.setItem(LAST,id)}catch(e){}alertP(k);}break}}
+}
+function init(){
+ const anchor=document.querySelector(".card.prayers");if(!anchor)return;
+ const box=document.createElement("div");box.className="card ptc";box.id="ptBox";anchor.parentNode.insertBefore(box,anchor);
+ render();
+ if(st.loc){times();for(const k of FARD){const t=today[k];if(new Date()-t>10*60000){try{localStorage.setItem(LAST,t.toDateString()+k)}catch(e){}}}}
+ setInterval(check,15000);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden){dayKey="";check()}});
+ setTimeout(()=>{if(st.on&&st.loc)getAu()},4000);
+}
+window.ZadPT={calc:(d,la,lo,m)=>{const o=st.method;if(m)st.method=m;const r=calc(d,la,lo);st.method=o;return r},alertP,set:x=>{Object.assign(st,x);sv();dayKey="";render()}};
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
 </script>
 
 <script>
