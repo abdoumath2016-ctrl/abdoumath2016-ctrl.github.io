@@ -2013,5 +2013,75 @@ refresh();noteVis();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 </script>
 <p style="text-align:center;font-size:11px;opacity:.5;margin:8px 0 24px"><a href="privacy.html" style="color:inherit">سياسة الخصوصية</a></p>
+<style id="tabsCss">
+body{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+.tnav{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;background:var(--bg,#082A20);border-top:1px solid var(--line);padding:6px 4px calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(0,0,0,.25)}
+.tnav button{flex:1;border:0;background:none;color:var(--ink);opacity:.6;font:inherit;font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tnav button i{font-style:normal;font-size:1.35rem;line-height:1.2}
+.tnav button.on{opacity:1;color:var(--gold);font-weight:700}
+.tnav button.on i{transform:translateY(-1px)}
+body[data-tab="today"] .main>[data-t]:not([data-t~="today"]){display:none!important}
+body[data-tab="amal"] .main>*:not([data-t~="amal"]){display:none!important}
+body[data-tab="amal"] #extra{display:block!important}
+body:not([data-tab="today"]) .band{display:none!important}
+body:not([data-tab="amal"]):not([data-tab="today"]) .main{display:none!important}
+body[data-tab="lib"] #lib{display:flex!important}
+body:not([data-tab="lib"]) #lib{display:none!important}
+body[data-tab="adhkar"] #adk{display:flex!important}
+body:not([data-tab="adhkar"]) #adk{display:none!important}
+#lib .libh .close{display:none}
+.main .qgrid,#moreAll{display:none!important}
+.thd{display:flex;justify-content:space-between;align-items:baseline;padding-top:16px}
+.thd h2{margin:0;font-family:var(--display);font-size:2rem;color:var(--gold)}
+.thd span{color:var(--muted);font-size:.9rem}
+.adk{padding-top:16px;padding-bottom:30px;flex-direction:column;gap:10px}
+.adk .ab{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:14px;font:inherit;text-align:start;cursor:pointer}
+.adk .ab i{font-style:normal;font-size:1.6rem;width:36px;text-align:center}
+.adk .ab b{display:block;font-size:1.05rem}.adk .ab small{color:var(--muted);font-size:.8rem}
+.adk .ab.done{border-color:var(--gold)}.adk .ab.done b::after{content:" ✓";color:var(--gold)}
+body:not([data-tab="lib"])>p.pvl{display:none}.adn{margin:-4px 0 4px;background:var(--gold-soft);border:1px solid var(--gold);border-radius:14px;padding:9px 12px;font-size:.88rem;line-height:1.7;color:var(--ink)}.lrec{display:flex;flex-direction:column;gap:12px}
+</style>
+<div class="in adk notranslate" id="adk" translate="no" lang="ar">
+  <div class="thd"><h2>الأذكار</h2><span>حصّن يومك</span></div>
+  <p class="adn">اقرأ أذكارك من هنا، وتُسجَّل تلقائيًا في أعمال اليوم ✓</p>
+  <button type="button" class="ab" data-k="sabah" onclick="openSheet('sabah')"><i>🌅</i><div><b>أذكار الصباح</b><small>مع العدّاد والفضل</small></div></button>
+  <button type="button" class="ab" data-k="masaa" onclick="openSheet('masaa')"><i>🌙</i><div><b>أذكار المساء</b><small>مع العدّاد والفضل</small></div></button>
+  <button type="button" class="ab" data-k="mutlaq" onclick="openSheet('mutlaq')"><i>💬</i><div><b>الأذكار المطلقة</b><small>استغفار، تهليل، تسبيح، صلاة على النبي ﷺ</small></div></button>
+  <button type="button" class="ab" onclick="openSheet('tahsin')"><i>🛡️</i><div><b>التحصينات والرقية</b><small>من الأذكار الصحيحة</small></div></button>
+  <button type="button" class="ab" onclick="openSheet('subha')"><i>📿</i><div><b>المسبحة</b></div></button>
+  <button type="button" class="ab" onclick="openSheet('duas')"><i>🤲</i><div><b>أدعيتي</b><small>أدعيتك الخاصة</small></div></button>
+</div>
+<nav class="tnav notranslate" id="tnav" translate="no" lang="ar" aria-label="أقسام التطبيق">
+  <button type="button" data-tab="today"><i>🏠</i>اليوم</button>
+  <button type="button" data-tab="amal"><i>✅</i>الأعمال</button>
+  <button type="button" data-tab="adhkar"><i>📿</i>الأذكار</button>
+  <button type="button" data-tab="lib"><i>📚</i>المكتبة</button>
+</nav>
+<script>
+(function(){
+  const M=document.querySelector(".in.main");
+  const tag=(sel,t)=>{const e=typeof sel==="string"?document.querySelector(sel):sel;if(e)e.setAttribute("data-t",t)};
+  ["#ujb","#occ",".card.prayers","#cNiyya","#cMuh",".main .hadith",".main .dua-end","#savenote"].forEach(s=>tag(s,"today"));
+  ["#ess","#extra"].forEach(s=>tag(s,"amal"));
+  // amal header
+  {const pv=[...document.body.children].find(e=>e.tagName==="P"&&e.querySelector('a[href="privacy.html"]'));if(pv)pv.classList.add("pvl")}
+  // move week + stats to library as «سجلّي»
+  const lib=document.getElementById("lib"),wk=document.getElementById("week"),sec=wk&&wk.closest("section"),stt=M.querySelector(".stats");
+  if(sec&&lib){const box=document.createElement("div");box.className="lrec";const h=sec.querySelector("h2");if(h)h.textContent="سجلّي: آخر ٧ أيام";box.appendChild(sec);if(stt)box.appendChild(stt);
+    const z=lib.querySelector(".zset");lib.insertBefore(box,z?z.nextSibling:lib.firstChild)}
+  document.querySelectorAll("#lib .lgrid button").forEach(b=>{const o=b.getAttribute("onclick")||"";if(o.includes("'subha'")||o.includes("'mutlaq'"))b.remove()});
+  if(wk)wk.addEventListener("click",()=>setTimeout(()=>setTab("today"),0));
+  const btns=[...document.querySelectorAll("#tnav button")];
+  function upd(){const c=document.getElementById("cnt"),g=document.getElementById("goalv"),e=document.getElementById("tAmalC");if(e&&c&&g)e.textContent="أنجزت "+c.textContent+" من "+g.textContent;
+    try{const k=keyOf(cur),l=dayList(k);document.querySelectorAll("#adk .ab[data-k]").forEach(b=>b.classList.toggle("done",l.includes(b.dataset.k)))}catch(e){}}
+  window.setTab=function(t){document.body.dataset.tab=t;btns.forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+    const l=document.getElementById("lib");if(l)l.hidden=t!=="lib";window.scrollTo(0,0);if(t==="lib"&&typeof renderRaq==="function")try{renderRaq()}catch(e){};upd()};
+  btns.forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+  window.openLib=function(on){setTab(on?"lib":"today")};
+  const R=window.render;if(typeof R==="function"){window.render=function(){const r=R.apply(this,arguments);upd();return r}}
+  setTab("today");
+})();
+</script>
+
 </body>
 </html>
