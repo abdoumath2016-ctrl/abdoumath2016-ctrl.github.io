@@ -1,5 +1,5 @@
 // زاد اليوم — يعمل دون إنترنت، ولا يعلق إذا كان الإنترنت ضعيفًا
-const CACHE = "zad-v3";
+const CACHE = "zad-v4";
 const SHELL = ["./", "index.html", "new.html", "manifest.json", "privacy.html",
   "Cairo-Regular.ttf", "Cairo-SemiBold.ttf", "Cairo-Bold.ttf", "ScheherazadeNew-Bold.ttf",
   "icon-192.png", "icon-512.png", "adhan_takbir.mp3"];
@@ -17,6 +17,8 @@ self.addEventListener("fetch", e => {
   // طلبات خارجية غير الخطوط (مثل نص الحديث): تمرّ مباشرة دون تدخل
   if (url.origin !== location.origin && !/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) return;
   // صفحة البرنامج: نحاول الإنترنت ٣ ثوانٍ فقط، فإن تأخر نعرض النسخة المحفوظة فورًا ونحدّثها في الخلفية
+  // ركن الرياضيات برنامج مستقل: لا يتدخل فيه هذا الملف إطلاقًا
+  if (/rukn-math\.html$/.test(url.pathname)) return;
   if (req.mode === "navigate") {
     // كل صفحة تُحفظ باسمها، ونطلب من الخادم أحدث نسخة دائمًا (لا نعتمد على ذاكرة المتصفح القديمة)
     const page = /new\.html$/.test(url.pathname) ? "new.html" : /privacy\.html$/.test(url.pathname) ? "privacy.html" : "index.html";
